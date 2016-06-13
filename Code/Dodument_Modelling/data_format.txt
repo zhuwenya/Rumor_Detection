@@ -1,1 +1,17 @@
+1, text information
+The text information is stored as a table with the coloums
+1) document_id
+contcatenate the bizuin,appmsgid,itemidx as the document_id
+2) label
+0 -- non_rumor
+1 -- rumor
+3) text
+for example:
+Found this place on Yelp and glad we did. Great beer selection, the sandwiches are wonderful and huge, wings were very good.Family owned establishment and everyone we met was great, the owner, waitstaff and kitchen staff.  If we ever get to The Pittsburgh area again, we will go back!
+4) text_split (the result of the sentence tokenization)
+for example:
+['Mr Hoagie is an institution.', 'Walking in, it does seem like a throwback to 30 years ago, old fashioned menu board, booths out of the 70s, and a large selection of food.', 'Their speciality is the Italian Hoagie, and it is voted the best in the area year after year.', 'I usually order the burger, while the patties are obviously cooked from frozen, all of the other ingredients are very fresh.', 'Overall, its a good alternative to Subway, which is down the road.']
+5)len
+the sentence length of the each ocument
+
 

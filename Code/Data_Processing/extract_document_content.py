@@ -1,21 +1,74 @@
 # -*- encoding: utf-8 -*-
+# Author: Qiaoan Chen <kazenoyumechen@gmail.com>
 
 import codecs
 import re
-from time import sleep
+import jieba
 from argparse import ArgumentParser
 from bs4 import BeautifulSoup
 
 
+def get_text_parts(line):
+    """
+    Get text parts from line.
+
+    Input:
+    - line: each line is a document in the origin csv file.
+    - text: a single line string represents doc title and content.
+    """
+    text = ",".join(line.split(",")[4:])
+    return text
+
+
+def remove_html(html_content):
+    """
+    Removing html tags in content.
+
+    Input:
+    - html_content: a single line of html.
+    - doc_content: a single line of text containing content strings in html_content.
+    """
+    soup = BeautifulSoup(html_content, "html5lib")
+    doc_content = " ".join(soup.strings)
+    return doc_content
+
+
+def segmentation(doc_content):
+    """
+    Segmenting doc_content with jieba.
+
+    Input:
+    - doc_content: a single line of text in chinese.
+    - seg_content: a single line of text after segmentation.
+    """
+    seg_list = jieba.cut(doc_content)
+    seg_content = " ".join(seg_list)
+
+    # compress multiple spaces into one space
+    seg_content = re.sub(u"(\s|　)+", " ", seg_content, flags=re.UNICODE)
+    return seg_content
+    
+
 def extract_document_content(in_file, out_file):
-    in_file.readline() # skip csv header line
-    for line in in_file:
-        raw_content = ",".join(line.split(",")[4:])
-        soup = BeautifulSoup(raw_content, "html5lib")
-        content = " ".join(soup.strings)
-        content = re.sub(u"(\s| | |　)+", " ", content, flags=re.UNICODE)
-        out_file.write(content)
+    """
+    Extract contents in in_file to out_file.
+
+    Input:
+    - in_file: input file object.
+    - out_file: output file object.
+    """
+     # skip csv header line
+    in_file.readline()
+    
+    for i, line in enumerate(in_file):
+        text = get_text_parts(line)
+        doc_content = remove_html(text)
+        seg_content = segmentation(doc_content)
+        out_file.write(seg_content)
         out_file.write("\n")
+
+        if i % 1000 == 0:
+            print "processing line", i
         
        
 if __name__ == "__main__":

@@ -16,3 +16,8 @@ __Large scale(Text-L)__:
 | Method  | Text-S | Text-M | Text-L |
 |---------|--------|--------|--------|
 | TFIDF 2-gram | 89.8 | | | |
+
+
+## ToDo:
+* verify performance degradation adding malicious articles (rumor type removed) 
+into normal articles.

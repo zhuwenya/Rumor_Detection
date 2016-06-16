@@ -2,7 +2,6 @@
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 
 import argparse
-import codecs
 import numpy as np
 
 from sklearn.cross_validation import cross_val_score
@@ -11,9 +10,10 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.utils import shuffle
+from rumor_detect.document_modelling.preprocessing.corpus import TextCorpus
 
 
-def construct_dataset(pos_file, neg_file):
+def construct_dataset(pos_path, neg_path):
     """
     Construct data set from pos_file and neg_file object.
     Each line in those files is a segmented document.
@@ -25,8 +25,8 @@ def construct_dataset(pos_file, neg_file):
     - X: list of documents.
     - y: document labels.
     """
-    X_pos = [line.strip() for line in pos_file]
-    X_neg = [line.strip() for line in neg_file]
+    X_pos = [doc for doc in TextCorpus(pos_path)]
+    X_neg = [doc for doc in TextCorpus(neg_path)]
     y_pos = np.ones(len(X_pos), dtype=np.int32)
     y_neg = -1 * np.ones(len(X_neg), dtype=np.int32)
     X = X_pos + X_neg
@@ -102,9 +102,7 @@ if __name__ == "__main__":
         help="negative instances file path"
     )
     args = parser.parse_args()
-    with codecs.open(args.pos_path, "r", "utf-8") as pos_file,\
-        codecs.open(args.neg_path, "r", "utf-8") as neg_file:
-        X, y = construct_dataset(pos_file, neg_file)
+    X, y = construct_dataset(args.pos_path, args.neg_path)
 
     # Searching for good tfidf param
     # tfidf_param_search(X, y)

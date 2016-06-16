@@ -15,7 +15,7 @@ from rumor_detect.document_modelling.preprocessing.corpus import TextCorpus
 
 def construct_dataset(pos_path, neg_path):
     """
-    Construct data set from pos_file and neg_file object.
+    Construct data set from pos_path and neg_path object.
     Each line in those files is a segmented document.
 
     Input:

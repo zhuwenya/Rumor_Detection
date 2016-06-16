@@ -51,3 +51,22 @@ class TextCorpus(Corpus):
         for line in Corpus.__iter__(self):
             doc = ",".join(line.split(",")[4:])
             yield doc
+
+
+class TextSegmentedCorpus(TextCorpus):
+    """
+    Construct corpus from a csv file. This corpus only return _doc_ field in
+    the csv file. A return instance is a list of strings and each string is
+    a word in the original document.
+    """
+    def __init__(self, path):
+        TextCorpus.__init__(self, path)
+
+    def __iter__(self):
+        """
+        Iterate each line and extract the doc column from the csv.
+        Output:
+        - doc: a string represents the doc column in each line.
+        """
+        for doc in TextCorpus.__iter__(self):
+             yield [word for word in doc.split(" ") if len(word) > 0]

@@ -2,6 +2,7 @@
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 
 import argparse
+import random
 import numpy as np
 import logging
 from sklearn.cross_validation import cross_val_score
@@ -47,29 +48,65 @@ class HelperCorpus:
         return self.neg_count_
 
 
+class MemoryHelperCorpus:
+    def __init__(self, pos_path, neg_path):
+        helper_corpus = HelperCorpus(pos_path, neg_path)
+        self.sentences_ = [sentence for sentence in helper_corpus]
+        self.pos_count_ = helper_corpus.pos_count()
+        self.neg_count_ = helper_corpus.neg_count()
+
+    def __iter__(self):
+        random.shuffle(self.sentences_)
+        for sentence in self.sentences_:
+            yield sentence
+
+    def pos_count(self):
+        return self.pos_count_
+
+    def neg_count(self):
+        return self.neg_count_
+
+
 def grid_search(pos_path, neg_path):
     logger = logging.getLogger("doc2vec.run")
+    results = {}
 
-    logger.info("Training Doc2Vec")
-    corpus = HelperCorpus(pos_path, neg_path)
-    model = Doc2Vec(corpus, size=100, alpha=.025, window=8, min_count=5,
-                    sample=0, hs=1, dm_concat=1, workers=4)
+    for neg in [5, 10, 20, 40]:
+        # fix random seed to remove perturbation
+        random.seed(12345)
 
-    logger.info("Retrieving Doc2Vec")
-    X = np.zeros((corpus.pos_count() + corpus.neg_count(), 100))
-    y = np.zeros(corpus.pos_count() + corpus.neg_count(), dtype=np.int32)
-    for pos_i in range(corpus.pos_count()):
-        X[pos_i] = model.docvecs['POS_%d' % pos_i]
-        y[pos_i] = 1
-    for neg_i in range(corpus.neg_count()):
-        X[corpus.pos_count() + neg_i] = model.docvecs['NEG_%d' % neg_i]
-        y[neg_i] = -1
+        logger.info("Feeding corpus into memory")
+        corpus = MemoryHelperCorpus(pos_path, neg_path)
 
-    logger.info("Training LR")
-    lr = LogisticRegression()
-    scores = cross_val_score(lr, X, y)
-    score = np.mean(scores)
-    logger.info("Cross validation score for LR: %.3f" % score)
+        logger.info("Training Doc2Vec")
+        model = Doc2Vec(corpus, size=100, alpha=0.025, window=4, min_count=5,
+                        sample=0, hs=0, negative=neg, dm_concat=1, iter=10, workers=7)
+
+        logger.info("Retrieving Doc2Vec")
+        X = np.zeros((corpus.pos_count() + corpus.neg_count(), 100))
+        y = np.zeros(corpus.pos_count() + corpus.neg_count(), dtype=np.int32)
+        for pos_i in range(corpus.pos_count()):
+            X[pos_i] = model.docvecs['POS_%d' % pos_i]
+            y[pos_i] = 1
+        for neg_i in range(corpus.neg_count()):
+            X[corpus.pos_count() + neg_i] = model.docvecs['NEG_%d' % neg_i]
+            y[neg_i] = -1
+
+        logger.info("Training LR")
+        lr = LogisticRegression()
+        scores = cross_val_score(lr, X, y)
+        score = np.mean(scores)
+        logger.info("Cross validation score for LR: %.3f" % score)
+        results["neg_%f" % neg] = score
+
+        del corpus
+        del model
+        del X
+        del y
+        del lr
+
+    for k, v in results.iteritems():
+        logger.info("%s: %s" % (k, v))
 
 
 if __name__ == "__main__":

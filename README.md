@@ -16,4 +16,5 @@ __Large scale(Text-L)__:
 | Method  | Text-S | Text-M | Text-L |
 |---------|--------|--------|--------|
 | TFIDF 2-gram | 93.18 | | | |
+| doc2vec (from scratch) | 78.26 | | | |
 

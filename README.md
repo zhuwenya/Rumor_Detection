@@ -21,7 +21,7 @@ logarithm of the division between total number of documents and number of
 documents where the word appears. To deal with 0-value idf, idf value is
 smoothing by adding 1.
 
-__doc2vec__: This model is implemented in gensim, and is equivalent with
+__doc2vec__: This model is implemented in gensim, and is equivalent to
 _paragraph vector_. To better understand doc2vec, we test PV-DBOW and PV-DM
  (variants of paragraph vector) performance. The dimension of embedding is
  fixed to 400 and other hyper parameters are selected by cross validation.

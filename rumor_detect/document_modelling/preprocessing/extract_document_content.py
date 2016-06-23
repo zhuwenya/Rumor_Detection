@@ -35,7 +35,8 @@ class Document:
 
         Input:
         - html_content: a single line of html.
-        - doc_content: a single line of text containing content strings in html_content.
+        - doc_content: a single line of text containing content strings in
+          html_content.
         """
         soup = BeautifulSoup(html_content, "html5lib")
         doc_content = " ".join(soup.strings)

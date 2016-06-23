@@ -37,8 +37,8 @@ if __name__ == "__main__":
     lr.fit(X, y)
 
     # Print top k words with largest weights.
-    # Because word weight are affected by its inverse document frequency, here we define
-    # $ weights\[word\] = lr.coef\[word\] * idf\[word\] $.
+    # Because word weight are affected by its inverse document frequency,
+    # here we define $ weights\[word\] = lr.coef\[word\] * idf\[word\] $.
     k = int(args.k)
     names = tfidf.get_feature_names()
     weights = lr.coef_.flatten()

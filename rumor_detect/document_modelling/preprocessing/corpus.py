@@ -31,7 +31,7 @@ class Corpus(object):
         with codecs.open(self.path_, "r", "utf-8") as in_file:
             header = in_file.readline()
             for line in in_file:
-                yield line
+                yield line.strip()
 
 
 class TextCorpus(Corpus):
@@ -69,4 +69,4 @@ class TextSegmentedCorpus(TextCorpus):
         - doc: a string represents the doc column in each line.
         """
         for doc in TextCorpus.__iter__(self):
-             yield [word for word in doc.split(" ") if len(word) > 0]
+             yield [word for word in doc.split(" ") if len(word.strip()) > 0]

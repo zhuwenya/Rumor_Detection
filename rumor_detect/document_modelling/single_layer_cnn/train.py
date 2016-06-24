@@ -65,7 +65,8 @@ def run(train_batch_generator, dev_batch_generator, num_words):
                 summary_str = sess.run(summary_op, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, step)
 
-            if step % TEST_PER_ITER == 0 and step == 0:
+            if (step % TEST_PER_ITER == 0 and step != 0) or \
+               step == num_iter_total - 1:
                 accuracy_values = []
                 for i in xrange(TEST_NUM_BATCH):
                     X_feed, y_feed = dev_batch_generator.next_batch()

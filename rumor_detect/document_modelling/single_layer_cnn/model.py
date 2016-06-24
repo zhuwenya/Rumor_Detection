@@ -61,6 +61,7 @@ def input_placeholder():
     y = tf.placeholder(tf.int32, shape=[None], name="input_y")
     return X, y
 
+
 def inference(X, vocab_size):
     """ Build the convolution model.
 
@@ -77,7 +78,7 @@ def inference(X, vocab_size):
         W = variable_with_weight_decay_(
             name="weights",
             shape=[vocab_size, EMBEDDING_SIZE],
-            stddev=INIT_STDDEV * 100,
+            stddev=1,
             wd=WEIGHT_DECAY
         )
         embedded_X = tf.nn.embedding_lookup(W, X, name="X")

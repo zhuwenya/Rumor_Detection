@@ -51,11 +51,11 @@ def run(train_batch_generator, dev_batch_generator, num_words):
                                      feed_dict=feed_dict)
             duration = time.time() - start_time
 
-            if step % 1 == 0:
+            if step % 10 == 0:
                 msg = "%s: step=%d, loss=%f, batch_time=%.3f"
                 print msg % (datetime.datetime.now(), step, loss_value, duration)
 
-            if step % 100 == 0:
+            if step % 20 == 0:
                 summary_str = sess.run(summary_op, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, step)
 

@@ -20,7 +20,8 @@ def run(train_batch_generator, dev_batch_generator, num_words):
     num_iter_per_epoch = train_batch_generator.num_iter_per_epoch()
     num_iter_total = num_iter_per_epoch * NUM_EPOCH
 
-    with tf.Graph().as_default():
+    with tf.Graph().as_default(),\
+         tf.device('/gpu:1'):
         global_step = tf.Variable(0, trainable=False)
 
         # construct graph
@@ -36,7 +37,12 @@ def run(train_batch_generator, dev_batch_generator, num_words):
         # build the initialization operation.
         init_op = tf.initialize_all_variables()
 
-        sess = tf.Session()
+        config=tf.ConfigProto(
+            allow_soft_placement=True,
+            log_device_placement=True
+        )
+        config.gpu_options.allow_growth = True
+        sess = tf.Session(config=config)
 
         # initialize variables first
         sess.run(init_op)
@@ -59,7 +65,7 @@ def run(train_batch_generator, dev_batch_generator, num_words):
                 summary_str = sess.run(summary_op, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, step)
 
-            if step % TEST_PER_ITER == 0:
+            if step % TEST_PER_ITER == 0 and step == 0:
                 accuracy_values = []
                 for i in xrange(TEST_NUM_BATCH):
                     X_feed, y_feed = dev_batch_generator.next_batch()

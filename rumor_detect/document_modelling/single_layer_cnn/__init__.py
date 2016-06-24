@@ -1,3 +1,3 @@
-# -*- encoding: utf-8 -*-
+# coding=utf-8
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 

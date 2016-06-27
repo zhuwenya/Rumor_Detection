@@ -25,15 +25,15 @@ PV-DM vectors concatenated) performance. The dimension of embedding is fixed to
 400 and other hyper parameters are selected by cross validation. After getting
 embedding vectors, a logistic regression is applied to perform classification.
 
-__CNN__:CNN is a single hidden layer word based convolution neural
+__CNN__: CNN is a single hidden layer word based convolution neural
 network for classification (Kim, 2014). The original purpose for this
 network is to do sentiment analysis. Because of its simpleness and efficiency,
 it is a strong baseline method for sentence classification. Here we treat each
 document as a long sentence input to this model. The widths of convolution
-filter are [2, 3, 4, 5], 100 filters for each width. We train 200-dimensional
+filter are 2, 3, 4 and 5, 100 filters for each width. We train 100-dimensional
 SkipGram (Mikolov et al., 2013) vectors from an unlabeded dataset with 770k
 documents. Our code is mainly based on [cnn-text-classification-tf][CNN-tf] and
-reimplemented to support loading word vectors. To better understand the effect
+reimplement it to support loading word vectors. To better understand the effect
 of pretrain word vectors, we also conduct an experiment on this model without
 pretrain vectors.
 

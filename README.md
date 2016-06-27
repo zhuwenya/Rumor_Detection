@@ -32,9 +32,10 @@ it is a strong baseline method for sentence classification. Here we treat each
 document as a long sentence input to this model. The widths of convolution
 filter are [2, 3, 4, 5], 100 filters for each width. We train 200-dimensional
 SkipGram (Mikolov et al., 2013) vectors from an unlabeded dataset with 770k
-documents. Our code is mainly based on [CNN-tf][CNN-tf] and reimplemented to
-support loading word vectors. To better understand the effect of pretrain word
-vectors, we also conduct an experiment on this model without pretrain vectors.
+documents. Our code is mainly based on [cnn-text-classification-tf][CNN-tf] and
+reimplemented to support loading word vectors. To better understand the effect
+of pretrain word vectors, we also conduct an experiment on this model without
+pretrain vectors.
 
 ## Result
 | Method | Variant  | Text-S |

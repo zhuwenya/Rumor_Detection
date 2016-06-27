@@ -25,7 +25,7 @@ PV-DM vectors concatenated) performance. The dimension of embedding is fixed to
 400 and other hyper parameters are selected by cross validation. After getting
 embedding vectors, a logistic regression is applied to perform classification.
 
-__CNN__:[CNN][CNN] is a single hidden layer word based convolution neural
+__CNN__:CNN is a single hidden layer word based convolution neural
 network for classification (Kim, 2014). The original purpose for this
 network is to do sentiment analysis. Because of its simpleness and efficiency,
 it is a strong baseline method for sentence classification. Here we treat each

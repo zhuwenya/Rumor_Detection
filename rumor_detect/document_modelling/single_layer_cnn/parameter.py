@@ -21,9 +21,9 @@ NUM_EPOCH = 60
 DECAY_EPOCH = 20
 DECAY_FACTOR = 0.1
 MOMENTUM = 0.9
-TEST_PER_ITER = 10
-TEST_NUM_BATCH = 1
+TEST_PER_ITER = 500
+TEST_NUM_BATCH = 50
 
 # directory
-LOG_DIR = "/tmp/tensorflow"
+LOG_DIR = "/tmp/tensorflow_log/"
 SAVE_DIR = "/tmp/tensorflow_save/"

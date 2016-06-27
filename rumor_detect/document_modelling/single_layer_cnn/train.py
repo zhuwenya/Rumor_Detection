@@ -2,6 +2,7 @@
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 import codecs
 import logging
+import os
 import numpy as np
 import tensorflow as tf
 from argparse import ArgumentParser
@@ -46,16 +47,18 @@ def run(train_batch_generator, dev_batch_generator, embedded_W):
     num_iter_per_epoch = train_batch_generator.num_iter_per_epoch()
     num_iter_total = num_iter_per_epoch * NUM_EPOCH
 
-    with tf.Graph().as_default(),\
-         tf.device('/gpu:1'):
+    with tf.Graph().as_default():
         global_step = tf.Variable(0, trainable=False)
 
         # construct graph
         X, y = input_placeholder()
-        logits = inference(X, embedded_W)
+        logits = inference(X, embedded_W, is_train=True)
         total_loss = loss(logits, y)
         accuracy_op = accuracy(logits, y)
         train_op = train(total_loss, global_step, num_iter_per_epoch)
+
+        # create a saver
+        saver = tf.train.Saver(tf.all_variables())
 
         # build the summary operation based on the graph.
         summary_op = tf.merge_all_summaries()
@@ -106,6 +109,12 @@ def run(train_batch_generator, dev_batch_generator, embedded_W):
                 msg = "validation step=%d, dev_accuracy=%.3f"
                 logger.info(msg % (step, dev_accuracy))
 
+                logger.info('saving model...')
+                if os.path.exists(SAVE_DIR) == False:
+                    os.mkdir(SAVE_DIR)
+                save_path = os.path.join(SAVE_DIR, 'model.ckpt')
+                saver.save(sess, save_path, global_step=step)
+
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -127,7 +136,7 @@ if __name__ == "__main__":
         help="vocabulary data location"
     )
     parser.add_argument(
-        "--word2vec_path",
+        "word2vec_path",
         help="model file for word2vec location."
     )
     args = parser.parse_args()

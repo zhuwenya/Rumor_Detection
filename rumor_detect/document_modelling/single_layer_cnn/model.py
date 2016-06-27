@@ -10,7 +10,7 @@ def activation_summary_(x):
 
 
 def moving_loss_(total_loss):
-    loss_averages = tf.train.ExponentialMovingAverage(0.999, name='avg')
+    loss_averages = tf.train.ExponentialMovingAverage(MOVING_AVG, name='avg')
     losses = tf.get_collection('losses')
     loss_averages_op = loss_averages.apply(losses + [total_loss])
 
@@ -62,11 +62,13 @@ def input_placeholder():
     return X, y
 
 
-def inference(X, embedded_W=None):
+def inference(X, embedded_W, is_train=True):
     """ Build the convolution model.
 
     Input
     - embedded_W: initialized value for embedded layer weights.
+    - is_train: boolean value. If set to true, then training policy will
+      applied. Otherwise it will apply testing policy.
     Output
     - softmax: tensorflow variable for final softmax.
     """
@@ -118,7 +120,7 @@ def inference(X, embedded_W=None):
         )
         concat_flat_drop = tf.nn.dropout(
             concat_flat,
-            DROPOUT_RATE,
+            DROPOUT_KEEP_PROB if is_train else 1.0,
             name="dropout"
         )
         activation_summary_(concat_flat_drop)
@@ -175,7 +177,7 @@ def train(total_loss, global_step, num_iter_per_epoch):
         if grad is not None:
             tf.histogram_summary(var.op.name + '/gradient', grad)
 
-    variable_averages = tf.train.ExponentialMovingAverage(0.999, global_step)
+    variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVG, global_step)
     variable_averages_op = variable_averages.apply(tf.trainable_variables())
 
     with tf.control_dependencies([apply_gradient_op, variable_averages_op]):

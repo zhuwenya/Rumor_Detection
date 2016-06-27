@@ -28,6 +28,7 @@ _paragraph vector_. To better understand doc2vec, we test PV-DBOW and PV-DM
  After getting embedding vectors, a logistic regression is applied to perform
  classification.
 
+
 ## Result
 | Method  | Text-S | Text-M | Text-L |
 |---------|--------|--------|--------|

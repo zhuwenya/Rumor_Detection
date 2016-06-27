@@ -82,9 +82,8 @@ class Vocabulary(object):
         """
         idx_str_list = []
         for word in sentence:
-            word = word.lower() if self.lower_case_ else word
-            word = word if word in self.word_to_idx_ else UNKNOWN_TOKEN_
-            idx_str = str(self.word_to_idx_[word])
+            idx = self.word_idx(word)
+            idx_str = str(idx)
             idx_str_list.append(idx_str)
 
         encode_str = ' '.join(idx_str_list)
@@ -102,7 +101,6 @@ class Vocabulary(object):
         encode_strs = [self.encode_sentence(sentence) for sentence in reader]
         return encode_strs
 
-
     def number_words(self):
         """
         Get number of words in the vocabulary.
@@ -111,6 +109,11 @@ class Vocabulary(object):
         """
         num_words = len(self.word_to_idx_)
         return num_words
+
+    def word_idx(self, word):
+        word = word.lower() if self.lower_case_ else word
+        word = word if word in self.word_to_idx_ else UNKNOWN_TOKEN_
+        return self.word_to_idx_[word]
 
     def padding_token_idx(self):
         """

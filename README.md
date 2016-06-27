@@ -38,7 +38,7 @@ vectors, we also conduct an experiment on this model without pretrain vectors.
 
 ## Result
 | Method | Variant  | Text-S |
-|---------| - | --------|
+|--------|----------|--------|
 | TFIDF n-gram | up to 2-gram | 93.2 |
 | doc2vec | PV-DBOW | 88.3 |
 | doc2vec | PV-DM | 81.2 |
@@ -50,14 +50,14 @@ vectors, we also conduct an experiment on this model without pretrain vectors.
 ## Reference
 * sklearn: <http://scikit-learn.org/>
 * gensim: <https://radimrehurek.com/gensim/>
+* cnn-text-classification-tf:
+<https://github.com/dennybritz/cnn-text-classification-tf>
 * Quoc Le and Tomas Mikolov. 2014.
 Distributed Representations of Sentences and Documents.
 * Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg Corrado and Jeffrey Dean. 2013.
 Distributed Representations of Words and Phrases and their Compositionality.
 * Yoon Kim. 2014.
 Convolutional Neural Networks for Sentence Classification.
-* cnn-text-classification-tf:
-<https://github.com/dennybritz/cnn-text-classification-tf>
 
 
 

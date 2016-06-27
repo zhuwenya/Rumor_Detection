@@ -6,13 +6,13 @@ import logging
 import numpy as np
 import tensorflow as tf
 from parameter import *
-from rumor_detect.document_modelling.single_layer_cnn.batch_generator import \
+from rumor_detect.document_modelling.cnn.batch_generator import \
     BatchGenerator
-from rumor_detect.document_modelling.single_layer_cnn.model import \
+from rumor_detect.document_modelling.cnn.model import \
     input_placeholder, inference, accuracy
-from rumor_detect.document_modelling.single_layer_cnn.preprocess.vocabulary import \
+from rumor_detect.document_modelling.cnn.preprocess.vocabulary import \
     Vocabulary
-from rumor_detect.document_modelling.single_layer_cnn.train import \
+from rumor_detect.document_modelling.cnn.train import \
     init_embedded_weights
 
 logger = logging.getLogger('eval.py')

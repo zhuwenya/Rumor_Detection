@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 
 from rumor_detect.document_modelling.preprocessing.corpus import TextSegmentedCorpus
-from rumor_detect.document_modelling.single_layer_cnn.preprocess.vocabulary import Vocabulary
+from rumor_detect.document_modelling.cnn.preprocess.vocabulary import Vocabulary
 
 if __name__ == "__main__":
     """

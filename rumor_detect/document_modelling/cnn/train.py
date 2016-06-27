@@ -10,11 +10,11 @@ from argparse import ArgumentParser
 import time
 
 from parameter import *
-from rumor_detect.document_modelling.single_layer_cnn.batch_generator import \
+from rumor_detect.document_modelling.cnn.batch_generator import \
     BatchGenerator
-from rumor_detect.document_modelling.single_layer_cnn.model import \
+from rumor_detect.document_modelling.cnn.model import \
     input_placeholder, inference, loss, train, accuracy
-from rumor_detect.document_modelling.single_layer_cnn.preprocess.vocabulary import \
+from rumor_detect.document_modelling.cnn.preprocess.vocabulary import \
     Vocabulary
 
 

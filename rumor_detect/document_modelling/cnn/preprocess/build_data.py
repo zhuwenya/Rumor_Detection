@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from sklearn.utils import shuffle
 
 from rumor_detect.document_modelling.preprocessing.corpus import TextSegmentedCorpus
-from rumor_detect.document_modelling.single_layer_cnn.preprocess.vocabulary import Vocabulary
+from rumor_detect.document_modelling.cnn.preprocess.vocabulary import Vocabulary
 
 if __name__ == "__main__":
     parser = ArgumentParser()

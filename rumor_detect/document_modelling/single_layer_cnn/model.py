@@ -10,6 +10,7 @@ def activation_summary_(x):
 
 
 def moving_loss_(total_loss):
+    loss_averages = tf.train.ExponentialMovingAverage(0.999, name='avg')
     losses = tf.get_collection('losses')
     loss_averages_op = loss_averages.apply(losses + [total_loss])
 

@@ -10,7 +10,6 @@ def activation_summary_(x):
 
 
 def moving_loss_(total_loss):
-    loss_averages = tf.train.ExponentialMovingAverage(0.99, name='avg')
     losses = tf.get_collection('losses')
     loss_averages_op = loss_averages.apply(losses + [total_loss])
 
@@ -21,7 +20,7 @@ def moving_loss_(total_loss):
     return loss_averages_op
 
 
-def variable_with_weight_decay_(name, shape, stddev, wd=None):
+def variable_init_gaussian_with_weight_decay_(name, shape, stddev, wd=None):
     """
     Helper to create an initialized variable with weight decay.
 
@@ -41,7 +40,7 @@ def variable_with_weight_decay_(name, shape, stddev, wd=None):
     return var
 
 
-def variable_init_with_constant_(name, shape, val=.0):
+def variable_init_constant_(name, shape, val=.0):
     """
     Helper to create an variable. Initalized all to val.
     Input
@@ -62,25 +61,16 @@ def input_placeholder():
     return X, y
 
 
-def inference(X, vocab_size):
+def inference(X, embedded_W=None):
     """ Build the convolution model.
 
     Input
-    - vocab_size: vocabulary size.
-    - embedding_size: embedding size for a word.
-    - num_filter: number of filter used in convolution.
-    - filter_sizes: a list of int, each int represents a convolution filter
-      kernel size.
+    - embedded_W: initialized value for embedded layer weights.
     Output
     - softmax: tensorflow variable for final softmax.
     """
     with tf.variable_scope('EmbeddedLayer'):
-        W = variable_with_weight_decay_(
-            name="weights",
-            shape=[vocab_size, EMBEDDING_SIZE],
-            stddev=1,
-            wd=None
-        )
+        W = tf.Variable(embedded_W, name="weights", dtype=tf.float32)
         embedded_X = tf.nn.embedding_lookup(W, X, name="X")
         # expand X to shape
         embedded_X_expand = tf.expand_dims(embedded_X, -1, name="X_expand")
@@ -91,13 +81,13 @@ def inference(X, vocab_size):
     for filter_size in FILTER_SIZES:
         with tf.variable_scope('Conv-%d' % filter_size):
             filter_shape = [filter_size, EMBEDDING_SIZE, 1, NUM_FILTERS]
-            W = variable_with_weight_decay_(
+            W = variable_init_gaussian_with_weight_decay_(
                 name="weights",
                 shape=filter_shape,
                 stddev=INIT_STDDEV,
                 wd=WEIGHT_DECAY
             )
-            b = variable_init_with_constant_("bias", [NUM_FILTERS], INIT_STDDEV)
+            b = variable_init_constant_("bias", [NUM_FILTERS], INIT_STDDEV)
             conv = tf.nn.conv2d(
                 embedded_X_expand, W,
                 strides=[1, 1, 1, 1],
@@ -133,12 +123,12 @@ def inference(X, vocab_size):
         activation_summary_(concat_flat_drop)
 
     with tf.variable_scope("FullyConnected"):
-        W = variable_with_weight_decay_(
+        W = variable_init_gaussian_with_weight_decay_(
             name="weights",
             shape=[num_filter_total, NUM_CLASSES],
             stddev=INIT_STDDEV
         )
-        b = variable_init_with_constant_("bias", [NUM_CLASSES], 0)
+        b = variable_init_constant_("bias", [NUM_CLASSES], 0)
         logits = tf.add(tf.matmul(concat_flat_drop, W), b, name="logits")
         activation_summary_(logits)
 
@@ -163,6 +153,7 @@ def train(total_loss, global_step, num_iter_per_epoch):
         DECAY_FACTOR,
         staircase=True
     )
+    tf.scalar_summary('learning rate', lr)
 
     moving_loss_op = moving_loss_(total_loss)
 
@@ -183,7 +174,7 @@ def train(total_loss, global_step, num_iter_per_epoch):
         if grad is not None:
             tf.histogram_summary(var.op.name + '/gradient', grad)
 
-    variable_averages = tf.train.ExponentialMovingAverage(0.9, global_step)
+    variable_averages = tf.train.ExponentialMovingAverage(0.999, global_step)
     variable_averages_op = variable_averages.apply(tf.trainable_variables())
 
     with tf.control_dependencies([apply_gradient_op, variable_averages_op]):

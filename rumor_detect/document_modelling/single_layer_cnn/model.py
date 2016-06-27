@@ -10,7 +10,7 @@ def activation_summary_(x):
 
 
 def moving_loss_(total_loss):
-    loss_averages = tf.train.ExponentialMovingAverage(0.9, name='avg')
+    loss_averages = tf.train.ExponentialMovingAverage(0.99, name='avg')
     losses = tf.get_collection('losses')
     loss_averages_op = loss_averages.apply(losses + [total_loss])
 
@@ -36,7 +36,7 @@ def variable_with_weight_decay_(name, shape, stddev, wd=None):
     initializer = tf.truncated_normal_initializer(stddev=stddev)
     var = tf.get_variable(name, shape, initializer=initializer)
     if wd is not None:
-        weight_decay = tf.mul(tf.nn.l2_loss(var), name='weight_loss')
+        weight_decay = tf.mul(tf.nn.l2_loss(var), wd, name='weight_loss')
         tf.add_to_collection('losses', weight_decay)
     return var
 
@@ -79,7 +79,7 @@ def inference(X, vocab_size):
             name="weights",
             shape=[vocab_size, EMBEDDING_SIZE],
             stddev=1,
-            wd=WEIGHT_DECAY
+            wd=None
         )
         embedded_X = tf.nn.embedding_lookup(W, X, name="X")
         # expand X to shape

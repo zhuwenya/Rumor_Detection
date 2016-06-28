@@ -69,4 +69,4 @@ class TextSegmentedCorpus(TextCorpus):
         - doc: a string represents the doc column in each line.
         """
         for doc in TextCorpus.__iter__(self):
-             yield [word for word in doc.split(" ") if len(word.strip()) > 0]
+             yield [word for word in doc.split() if len(word.strip()) > 0]

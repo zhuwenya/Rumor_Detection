@@ -47,8 +47,7 @@ def run(train_corpus, valid_corpus, word2vec_lookup_table):
         )
 
         config = tf.ConfigProto(
-            allow_soft_placement=True,
-            log_device_placement=True
+            allow_soft_placement=True
         )
         config.gpu_options.allow_growth = True
         sess = tf.Session(config=config)

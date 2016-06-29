@@ -43,7 +43,8 @@ def run(train_corpus, valid_corpus, word2vec_lookup_table):
             global_step=global_step,
             decay_steps=num_iter_lr_decay,
             initial_learning_rate=LEARNING_RATE_INIT,
-            decay_rate=LEARNING_RATE_DECAY_FACTOR
+            decay_rate=LEARNING_RATE_DECAY_FACTOR,
+            max_gradient_norm=MAX_GRADIENT_NORM
         )
         init_op = tf.initialize_all_variables()
 

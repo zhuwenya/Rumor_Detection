@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
         X, y = input_placeholder()
         logits = inference(X, embedded_W_gpu, is_training=False)
-        y_pred_op = predict(X)
+        y_pred_op = predict(logits)
 
         # restore the moving average version of the learned variables for eval
         variable_averages = tf.train.ExponentialMovingAverage(0.999)

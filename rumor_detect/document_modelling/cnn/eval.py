@@ -65,17 +65,19 @@ if __name__ == "__main__":
 
         logger.info('validating (moving average and dropout applied)...')
 
-        y_pred_batches, y_gt_batches = [], []
         num_test_iter = valid_corpus.num_iter_in_epoch(BATCH_SIZE)
+        y_pred = np.zeros(num_test_iter * BATCH_SIZE, NUM_CLASSES)
+        y_gt = np.zeros(num_test_iter * BATCH_SIZE, dtype=np.int32)
         for i in xrange(num_test_iter):
             X_feed, y_feed, _ = valid_corpus.next_batch(BATCH_SIZE)
             feed_dict = {X: X_feed, y: y_feed}
             y_pred_batch = sess.run([y_pred_op], feed_dict=feed_dict)
-            y_pred_batches.append(y_pred_batch)
-            y_gt_batches.append(y_feed)
 
-        y_pred = np.vstack(y_pred_batches)
-        y_gt = np.vstack(y_gt_batches).flatten()
+            start_idx = i * BATCH_SIZE
+            end_idx = start_idx + BATCH_SIZE
+            y_pred[start_idx:end_idx] = y_pred_batch
+            y_gt[start_idx:end_idx] = y_feed
+
         precison, recall, thresholds = precision_recall_curve(y_gt, y_pred[:, NUM_CLASSES-1])
         print precison
         print recall

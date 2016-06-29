@@ -85,7 +85,7 @@ def run(train_corpus, valid_corpus, word2vec_lookup_table):
                     X_feed, y_feed, _ = valid_corpus.next_batch(BATCH_SIZE)
                     feed_dict = {X: X_feed, y: y_feed}
                     accuracy_value = sess.run(
-                        [accuracy_op],
+                        accuracy_op,
                         feed_dict=feed_dict
                     )
                     accuracy_values.append(accuracy_value)

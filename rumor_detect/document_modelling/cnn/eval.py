@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 import logging
 
+import pickle
 import numpy as np
 from sklearn.metrics import precision_recall_curve
 import tensorflow as tf
@@ -66,19 +67,30 @@ if __name__ == "__main__":
         logger.info('validating (moving average and dropout applied)...')
 
         num_test_iter = valid_corpus.num_iter_in_epoch(BATCH_SIZE)
-        y_pred = np.zeros(num_test_iter * BATCH_SIZE, NUM_CLASSES)
-        y_gt = np.zeros(num_test_iter * BATCH_SIZE, dtype=np.int32)
+        y_pred = np.zeros((num_test_iter * BATCH_SIZE, NUM_CLASSES))
+        y_gt = np.zeros((num_test_iter * BATCH_SIZE, ), dtype=np.int32)
         for i in xrange(num_test_iter):
             X_feed, y_feed, _ = valid_corpus.next_batch(BATCH_SIZE)
             feed_dict = {X: X_feed, y: y_feed}
-            y_pred_batch = sess.run([y_pred_op], feed_dict=feed_dict)
+            y_pred_batch = sess.run(y_pred_op, feed_dict=feed_dict)
 
             start_idx = i * BATCH_SIZE
             end_idx = start_idx + BATCH_SIZE
-            y_pred[start_idx:end_idx] = y_pred_batch
+            y_pred[start_idx:end_idx, :] = y_pred_batch
             y_gt[start_idx:end_idx] = y_feed
 
-        precison, recall, thresholds = precision_recall_curve(y_gt, y_pred[:, NUM_CLASSES-1])
-        print precison
-        print recall
-        print thresholds
+        # dump results
+        logger.info('dump results into file result.pk ...')
+        accuracy = np.mean(np.argmax(y_pred) == y_gt)
+        precisons, recalls, thresholds = precision_recall_curve(
+            y_true=y_gt,
+            probas_pred=y_pred[:, NUM_CLASSES-1]
+        )
+        m = {
+            'accuracy': accuracy,
+            'precisons': precisons,
+            'recalls': recalls,
+            'thresholds': thresholds
+        }
+        pickle.dump(m, './result.pk')
+

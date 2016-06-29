@@ -9,10 +9,12 @@ import numpy as np
 import tensorflow as tf
 
 from parameters import *
-from rumor_detect.document_modelling.utils.tf_train_utils import train
-from rumor_detect.document_modelling.utils.rumor_corpus_for_nn import RumorCorpusForNN
+from rumor_detect.document_modelling.utils.tf_train_utils import train, loss, \
+    accuracy
+from rumor_detect.document_modelling.utils.rumor_corpus_for_nn import \
+    RumorCorpusForNN
 from rumor_detect.document_modelling.rnn.standard_lstm.model import \
-    create_placeholder, initialize_embedding_matrix, inference, loss, accuracy
+    create_placeholder, initialize_embedding_matrix, inference
 from rumor_detect.document_modelling.utils.word2vec_lookup_table import \
     Word2VecLookupTable
 
@@ -89,15 +91,16 @@ def run(train_corpus, valid_corpus, word2vec_lookup_table):
                 step + 1 == num_iter:
                 acc_vals = []
                 for i in xrange(num_iter_in_test):
-                    X_feed, y_feed, length_feed = valid_corpus.next_batch(BATCH_SIZE)
+                    X_feed, y_feed, length_feed = \
+                        valid_corpus.next_batch(BATCH_SIZE)
                     feed_dict = {X: X_feed, y: y_feed, length: length_feed}
-                    acc_val = sess.run([accuracy_op], feed_dict=feed_dict)
+                    acc_val = sess.run(accuracy_op, feed_dict=feed_dict)
                     acc_vals.append(acc_val)
                 dev_acc = np.mean(acc_vals)
                 logger.info('validation accuracy=%.3f' % dev_acc)
 
         logger.info('saving model...')
-        if os.path.exists(MODEL_DIR) == False:
+        if not os.path.exists(MODEL_DIR):
             os.makedirs(MODEL_DIR)
         save_path = os.path.join(MODEL_DIR, 'model.ckpt')
         saver.save(sess, save_path=save_path, global_step=num_iter-1)

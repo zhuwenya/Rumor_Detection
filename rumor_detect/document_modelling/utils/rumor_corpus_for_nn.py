@@ -17,7 +17,7 @@ def truncate_or_pad_(sequence, padding_idx, max_size):
     return fixed_length_seq, seq_length
 
 
-class RumorCorpus:
+class RumorCorpusForNN:
     def __init__(self, path, word2vec_lookup_table, fixed_size):
         sequences, labels, lengths = [], [], []
         with codecs.open(path, 'r', 'utf-8') as in_f:

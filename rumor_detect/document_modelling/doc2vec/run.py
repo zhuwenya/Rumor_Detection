@@ -8,7 +8,7 @@ import logging
 import sklearn.utils
 from sklearn.cross_validation import cross_val_score
 from sklearn.linear_model import LogisticRegression
-from rumor_detect.document_modelling.preprocessing.corpus \
+from rumor_detect.document_modelling.utils.corpus \
     import TextSegmentedCorpus
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 

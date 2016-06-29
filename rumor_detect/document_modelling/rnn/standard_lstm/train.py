@@ -3,16 +3,17 @@
 from argparse import ArgumentParser
 import logging
 import os
+import time
 
 import numpy as np
 import tensorflow as tf
-import time
+
 from parameters import *
-from rumor_detect.document_modelling.rnn.base_train import train
-from rumor_detect.document_modelling.rnn.rumor_corpus import RumorCorpus
+from rumor_detect.document_modelling.utils.tf_train_utils import train
+from rumor_detect.document_modelling.utils.rumor_corpus_for_nn import RumorCorpusForNN
 from rumor_detect.document_modelling.rnn.standard_lstm.model import \
     create_placeholder, initialize_embedding_matrix, inference, loss, accuracy
-from rumor_detect.document_modelling.rnn.word2vec_lookup_table import \
+from rumor_detect.document_modelling.utils.word2vec_lookup_table import \
     Word2VecLookupTable
 
 logger = logging.getLogger('rnn.standard_lstm.train')
@@ -125,13 +126,13 @@ if __name__ == "__main__":
     logger.info('building vocabulary from word2vec model file')
     word2vec_lookup_table = Word2VecLookupTable(args.word2vec_path)
     logger.info('loading train corpus...')
-    train_corpus = RumorCorpus(
+    train_corpus = RumorCorpusForNN(
         path=args.train_path,
         word2vec_lookup_table=word2vec_lookup_table,
         fixed_size=SEQUENCE_MAX_LENGTH
     )
     logger.info('loading validation corpus...')
-    dev_corpus = RumorCorpus(
+    dev_corpus = RumorCorpusForNN(
         path=args.dev_path,
         word2vec_lookup_table=word2vec_lookup_table,
         fixed_size=SEQUENCE_MAX_LENGTH

@@ -10,7 +10,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.utils import shuffle
-from rumor_detect.document_modelling.preprocessing.corpus import TextCorpus
+from rumor_detect.document_modelling.utils.corpus import TextCorpus
 
 
 def construct_dataset(pos_path, neg_path):

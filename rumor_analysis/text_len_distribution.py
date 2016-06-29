@@ -4,7 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from argparse import ArgumentParser
-from rumor_detect.document_modelling.preprocessing.corpus \
+from rumor_detect.document_modelling.utils.corpus \
     import TextSegmentedCorpus
 
 if __name__ == "__main__":

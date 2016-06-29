@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from argparse import ArgumentParser
 
-from rumor_detect.document_modelling.preprocessing.corpus import TextCorpus
+from rumor_detect.document_modelling.utils.corpus import TextCorpus
 
 
 PATTERN = u"，|。|！|？|；|……"

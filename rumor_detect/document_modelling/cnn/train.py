@@ -1,72 +1,52 @@
 # coding=utf-8
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
-import codecs
+
 import logging
 import os
+import time
 import numpy as np
 import tensorflow as tf
 from argparse import ArgumentParser
 
-import time
-
 from parameter import *
-from rumor_detect.document_modelling.cnn.batch_generator import \
-    BatchGenerator
 from rumor_detect.document_modelling.cnn.model import \
-    input_placeholder, inference, loss, train, accuracy
-from rumor_detect.document_modelling.cnn.preprocess.vocabulary import \
-    Vocabulary
+    input_placeholder, inference, initialize_embedding_matrix
+from rumor_detect.document_modelling.utils.rumor_corpus_for_nn import \
+    RumorCorpusForNN
+from rumor_detect.document_modelling.utils.tf_train_utils import train, loss, \
+    accuracy
+from rumor_detect.document_modelling.utils.word2vec_lookup_table import \
+    Word2VecLookupTable
+
+logger = logging.getLogger("cnn.train")
 
 
-logger = logging.getLogger("train.py")
-
-
-def init_embedded_weights(vocab, word2vec_path=None):
-    num_words = vocab.number_words()
-    W = np.random.normal(size=[num_words, EMBEDDING_SIZE])
-
-    # load word2vec model wegiths
-    if word2vec_path is not None:
-        logger.info('Loading word2vec model...')
-        with codecs.open(word2vec_path, 'r', 'utf-8') as in_file:
-            args = in_file.readline().strip().split()
-            word2vec_embedded_size = int(args[1])
-            assert word2vec_embedded_size == EMBEDDING_SIZE
-
-            for line in in_file:
-                args = line.strip().split()
-                word = args[0]
-                vector = np.array([float(num_str) for num_str in args[1:]])
-                idx = vocab.word_idx(word)
-                W[idx] = vector
-
-    return W
-
-
-def run(train_batch_generator, dev_batch_generator, embedded_W):
-    num_iter_per_epoch = train_batch_generator.num_iter_per_epoch()
-    num_iter_total = num_iter_per_epoch * NUM_EPOCH
+def run(train_corpus, valid_corpus, word2vec_lookup_table):
+    num_train_iter_per_epoch = train_corpus.num_iter_in_epoch(BATCH_SIZE)
+    num_train_iter_per_decay = num_train_iter_per_epoch * NUM_TRAIN_EPOCH_DECAY
+    num_train_iter_per_test = num_train_iter_per_epoch * NUM_TRAIN_EPOCH_TEST
+    num_train_iter_total = num_train_iter_per_epoch * NUM_TRAIN_EPOCH
 
     with tf.Graph().as_default():
-        global_step = tf.Variable(0, trainable=False)
+        logger.info('loading embedding matrix...')
+        embedded_W_cpu = word2vec_lookup_table.embedding_matrix()
+        embedded_W_gpu = initialize_embedding_matrix(embedded_W_cpu)
 
         # construct graph
         X, y = input_placeholder()
-        logits = inference(X, embedded_W, is_train=True)
-        total_loss = loss(logits, y)
+        logits = inference(X, embedded_W_gpu, is_training=True)
+        loss_op = loss(logits, y)
         accuracy_op = accuracy(logits, y)
-        train_op = train(total_loss, global_step, num_iter_per_epoch)
+        global_step = tf.Variable(0, trainable=False)
+        train_op = train(
+            loss=loss_op,
+            global_step=global_step,
+            decay_steps=num_train_iter_per_decay,
+            initial_learning_rate=INIT_LEARNING_RATE,
+            decay_rate=DECAY_FACTOR
+        )
 
-        # create a saver
-        saver = tf.train.Saver(tf.all_variables())
-
-        # build the summary operation based on the graph.
-        summary_op = tf.merge_all_summaries()
-
-        # build the initialization operation.
-        init_op = tf.initialize_all_variables()
-
-        config=tf.ConfigProto(
+        config = tf.ConfigProto(
             allow_soft_placement=True,
             log_device_placement=True
         )
@@ -74,51 +54,58 @@ def run(train_batch_generator, dev_batch_generator, embedded_W):
         sess = tf.Session(config=config)
 
         # initialize variables first
+        init_op = tf.initialize_all_variables()
         sess.run(init_op)
 
-        # delete embedded_W to save space
-        del embedded_W
-
+        summary_op = tf.merge_all_summaries()
         summary_writer = tf.train.SummaryWriter(LOG_DIR, sess.graph)
 
-        for step in xrange(num_iter_total):
+        for step in xrange(num_train_iter_total):
             start_time = time.time()
-            X_feed, y_feed = train_batch_generator.next_batch()
+            X_feed, y_feed, _ = train_corpus.next_batch(BATCH_SIZE)
             feed_dict = {X: X_feed, y: y_feed}
-            _, loss_value = sess.run([train_op, total_loss],
-                                     feed_dict=feed_dict)
+            _, loss_val, acc_val = sess.run(
+                [train_op, loss_op, accuracy_op],
+                feed_dict=feed_dict
+            )
             duration = time.time() - start_time
 
             if step % 10 == 0:
-                msg = "step=%d, loss=%f, batch_time=%.3f"
-                logger.info(msg % (step, loss_value, duration))
+                msg = "step=%d, loss=%f, accuracy=%.3f, batch_time=%.3f"
+                logger.info(msg % (step, loss_val, acc_val, duration))
 
             if step % 20 == 0:
                 summary_str = sess.run(summary_op, feed_dict=feed_dict)
                 summary_writer.add_summary(summary_str, step)
 
-            if (step % TEST_PER_ITER == 0 and step != 0) or \
-               step == num_iter_total - 1:
+            if (step % num_train_iter_per_test == 0 and step != 0) or \
+               step + 1 == num_train_iter_total:
                 accuracy_values = []
-                for i in xrange(TEST_NUM_BATCH):
-                    X_feed, y_feed = dev_batch_generator.next_batch()
+                num_test_iter = valid_corpus.num_iter_in_epoch(BATCH_SIZE)
+                for i in xrange(num_test_iter):
+                    X_feed, y_feed, _ = valid_corpus.next_batch(BATCH_SIZE)
                     feed_dict = {X: X_feed, y: y_feed}
-                    accuracy_value = sess.run([accuracy_op], feed_dict=feed_dict)
+                    accuracy_value = sess.run(
+                        [accuracy_op],
+                        feed_dict=feed_dict
+                    )
                     accuracy_values.append(accuracy_value)
-                dev_accuracy = np.mean(accuracy_values)
+                valid_accuracy = np.mean(accuracy_values)
                 msg = "validation step=%d, dev_accuracy=%.3f"
-                logger.info(msg % (step, dev_accuracy))
+                logger.info(msg % (step, valid_accuracy))
 
-                logger.info('saving model...')
-                if os.path.exists(SAVE_DIR) == False:
-                    os.mkdir(SAVE_DIR)
-                save_path = os.path.join(SAVE_DIR, 'model.ckpt')
-                saver.save(sess, save_path, global_step=step)
+        # saving models
+        logger.info('saving model...')
+        if not os.path.exists(SAVE_DIR):
+            os.mkdir(SAVE_DIR)
+        saver = tf.train.Saver(tf.all_variables())
+        save_path = os.path.join(SAVE_DIR, 'model.ckpt')
+        saver.save(sess, save_path, global_step=num_train_iter_total-1)
 
 
 if __name__ == "__main__":
     logging.basicConfig(
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        format="[%(asctime)s %(name)s %(levelname)s]: %(message)s",
         level=logging.INFO
     )
 
@@ -132,19 +119,24 @@ if __name__ == "__main__":
         help="validation data location."
     )
     parser.add_argument(
-        "vocab_path",
-        help="vocabulary data location"
-    )
-    parser.add_argument(
         "word2vec_path",
         help="model file for word2vec location."
     )
     args = parser.parse_args()
 
-    logger.info('loading vocabulary...')
-    vocab = Vocabulary.load(args.vocab_path)
-    logger.info('initializing weights...')
-    W = init_embedded_weights(vocab, args.word2vec_path)
-    train_generator = BatchGenerator(args.train_path, vocab)
-    dev_generator = BatchGenerator(args.dev_path, vocab)
-    run(train_generator, dev_generator, W)
+    logger.info('building vocabulary from word2vec model file')
+    word2vec_lookup_table = Word2VecLookupTable(args.word2vec_path)
+    logger.info('loading train corpus...')
+    train_corpus = RumorCorpusForNN(
+        path=args.train_path,
+        word2vec_lookup_table=word2vec_lookup_table,
+        fixed_size=SEQUENCE_MAX_LENGTH
+    )
+    logger.info('loading validation corpus...')
+    dev_corpus = RumorCorpusForNN(
+        path=args.dev_path,
+        word2vec_lookup_table=word2vec_lookup_table,
+        fixed_size=SEQUENCE_MAX_LENGTH
+    )
+    logger.info('start training...')
+    run(train_corpus, dev_corpus, word2vec_lookup_table)

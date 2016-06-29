@@ -64,23 +64,3 @@ def inference(X, length, embedded_W, is_training=True):
     return logits
 
 
-def loss(logits, y):
-    cross_ent = tf.nn.sparse_softmax_cross_entropy_with_logits(
-        logits=logits,
-        labels=y
-    )
-    cross_ent_mean = tf.reduce_mean(cross_ent, name='empirical_loss')
-    reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-    loss_op = tf.add_n(reg_losses + [cross_ent_mean], "loss")
-
-    tf.scalar_summary('empirical loss', cross_ent_mean)
-    tf.scalar_summary('loss', loss_op)
-
-    return loss_op
-
-
-def accuracy(logits, y):
-    correct = tf.nn.in_top_k(logits, y, 1)
-    correct_mean = tf.reduce_mean(tf.cast(correct, tf.float32))
-    tf.scalar_summary('accuracy', correct_mean)
-    return correct_mean

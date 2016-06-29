@@ -92,5 +92,7 @@ if __name__ == "__main__":
             'recalls': recalls,
             'thresholds': thresholds
         }
-        pickle.dump(m, './result.pk')
+
+        with open('result.pk', 'w') as out_f:
+            pickle.dump(m, out_f)
 

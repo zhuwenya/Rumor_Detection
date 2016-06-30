@@ -82,15 +82,10 @@ if __name__ == "__main__":
         # dump results
         logger.info('dump results into file result.pk ...')
         accuracy = np.mean(np.argmax(y_pred, axis=1) == y_gt)
-        precisons, recalls, thresholds = precision_recall_curve(
-            y_true=y_gt,
-            probas_pred=y_pred[:, NUM_CLASSES-1]
-        )
         m = {
             'accuracy': accuracy,
-            'precisons': precisons,
-            'recalls': recalls,
-            'thresholds': thresholds
+            'y_true': y_gt,
+            'y_pred': y_pred[:, NUM_CLASSES-1]
         }
 
         with open('result.pk', 'w') as out_f:

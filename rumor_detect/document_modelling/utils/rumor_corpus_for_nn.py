@@ -30,9 +30,10 @@ class RumorCorpusForNN:
                     word2vec_lookup_table.get_padding_word_idx(),
                     fixed_size
                 )
-                sequences.append(sequence)
-                labels.append(int(args[0]))
-                lengths.append(length)
+                if length != 0:
+                    sequences.append(sequence)
+                    labels.append(int(args[0]))
+                    lengths.append(length)
 
         self.sequences_ = np.array(sequences, dtype=np.int32)
         self.labels_ = np.array(labels, dtype=np.int32)

@@ -9,6 +9,8 @@ from rumor_detect.document_modelling.nn.common.rumor_corpus_for_nn import \
     RumorCorpusForNN
 from rumor_detect.document_modelling.nn.common.word2vec_lookup_table import \
     Word2VecLookupTable
+from rumor_detect.document_modelling.nn.rnn.lstm_avg.classifier import \
+    LSTMAverageClassifier
 from rumor_detect.document_modelling.nn.rnn.lstm_standard.classifier import \
     LSTMStandardClassifier
 from rumor_detect.document_modelling.nn.softmax.classifier import \
@@ -22,7 +24,8 @@ def construct_classifier(config):
     constructor = {
         'SOFTMAX': SoftmaxClassifier,
         'CNN': CNNClassifier,
-        'LSTM_STANDARD': LSTMStandardClassifier
+        'LSTM_STANDARD': LSTMStandardClassifier,
+        'LSTM_AVG': LSTMAverageClassifier
     }[config['CLASSIFER_TYPE']]
     clf = constructor(config)
     logger.info('get classifier %s' % type(clf).__name__)

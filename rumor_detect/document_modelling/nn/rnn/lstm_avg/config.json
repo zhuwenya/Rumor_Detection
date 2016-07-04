@@ -14,8 +14,8 @@
   "SEQUENCE_MAX_LEN": 2000,
   "NUM_CLASSES": 2,
   "MOVING_AVG": 0.999,
-  "CLASSIFER_TYPE": "LSTM_STANDARD",
-  "LOG_DIR": "/tmp/tensorflow/lstm_standard/log/",
-  "MODEL_DIR": "/tmp/tensorflow/lstm_standard/model/",
-  "RESULT_DIR": "/tmp/tensorflow/lstm_standard/result/"
+  "CLASSIFER_TYPE": "LSTM_AVG",
+  "LOG_DIR": "/tmp/tensorflow/lstm_avg/log/",
+  "MODEL_DIR": "/tmp/tensorflow/lstm_avg/model/",
+  "RESULT_DIR": "/tmp/tensorflow/lstm_avg/result/"
 }

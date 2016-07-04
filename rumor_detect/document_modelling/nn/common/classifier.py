@@ -154,9 +154,11 @@ class NeuralNetworkClassifier(object):
                 y_pred[start_idx:end_idx, :] = y_pred_batch
                 y_gt[start_idx:end_idx] = y_feed
 
+            accuracy = np.mean(np.argmax(y_pred, axis=1) == y_gt)
+            logger.info('validation accuracy: %.3f' % accuracy)
+
             # dump results
             logger.info('dump results...')
-            accuracy = np.mean(np.argmax(y_pred, axis=1) == y_gt)
             m = {
                 'accuracy': accuracy,
                 'y_true': y_gt,

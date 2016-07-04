@@ -1,0 +1,21 @@
+{
+  "BATCH_SIZE": 64,
+  "NUM_TRAIN_EPOCH": 60,
+  "NUM_TRAIN_EPOCH_PER_TEST": 20,
+  "NUM_DECAY_EPOCH": 20,
+  "DECAY_FACTOR": 0.1,
+  "INIT_LEARNING_RATE": 0.01,
+  "MOMENTUM": 0.9,
+  "RNN_HIDDEN_SIZE": 100,
+  "GAUSSIAN_STDDEV": 0.01,
+  "DROPOUT_KEEP_RATE": 0.5,
+  "WEIGHT_DECAY": 0.0001,
+  "MAX_GRAD_NORM": 5,
+  "SEQUENCE_MAX_LEN": 2000,
+  "NUM_CLASSES": 2,
+  "MOVING_AVG": 0.999,
+  "CLASSIFER_TYPE": "LSTM_STANDARD",
+  "LOG_DIR": "/tmp/tensorflow/lstm_standard/log/",
+  "MODEL_DIR": "/tmp/tensorflow/lstm_standard/model/",
+  "RESULT_DIR": "/tmp/tensorflow/lstm_standard/result/"
+}

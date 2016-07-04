@@ -2,18 +2,18 @@
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 from argparse import ArgumentParser
 import logging
-
 import pickle
+
 import numpy as np
-from sklearn.metrics import precision_recall_curve
 import tensorflow as tf
+
 from parameter import *
 from rumor_detect.document_modelling.cnn.model import \
     input_placeholder, inference, initialize_embedding_matrix
-from rumor_detect.document_modelling.utils.rumor_corpus_for_nn import \
+from rumor_detect.document_modelling.nn.common.rumor_corpus_for_nn import \
     RumorCorpusForNN
 from rumor_detect.document_modelling.utils.tf_train_utils import predict
-from rumor_detect.document_modelling.utils.word2vec_lookup_table import \
+from rumor_detect.document_modelling.nn.common.word2vec_lookup_table import \
     Word2VecLookupTable
 
 logger = logging.getLogger('cnn.eval')

@@ -11,14 +11,14 @@ import tensorflow as tf
 from parameters import *
 from rumor_detect.document_modelling.utils.tf_train_utils import train, loss, \
     accuracy
-from rumor_detect.document_modelling.utils.rumor_corpus_for_nn import \
+from rumor_detect.document_modelling.nn.common.rumor_corpus_for_nn import \
     RumorCorpusForNN
 from rumor_detect.document_modelling.rnn.standard_lstm.model import \
     create_placeholder, initialize_embedding_matrix, inference
-from rumor_detect.document_modelling.utils.word2vec_lookup_table import \
+from rumor_detect.document_modelling.nn.common.word2vec_lookup_table import \
     Word2VecLookupTable
 
-logger = logging.getLogger('rnn.standard_lstm.train')
+logger = logging.getLogger('rnn.lstm_standard.train')
 
 
 def run(train_corpus, valid_corpus, word2vec_lookup_table):

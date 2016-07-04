@@ -4,18 +4,19 @@
 import logging
 import os
 import time
+from argparse import ArgumentParser
+
 import numpy as np
 import tensorflow as tf
-from argparse import ArgumentParser
 
 from parameter import *
 from rumor_detect.document_modelling.cnn.model import \
     input_placeholder, inference, initialize_embedding_matrix
-from rumor_detect.document_modelling.utils.rumor_corpus_for_nn import \
+from rumor_detect.document_modelling.nn.common.rumor_corpus_for_nn import \
     RumorCorpusForNN
 from rumor_detect.document_modelling.utils.tf_train_utils import train, loss, \
     accuracy
-from rumor_detect.document_modelling.utils.word2vec_lookup_table import \
+from rumor_detect.document_modelling.nn.common.word2vec_lookup_table import \
     Word2VecLookupTable
 
 logger = logging.getLogger("cnn.train")

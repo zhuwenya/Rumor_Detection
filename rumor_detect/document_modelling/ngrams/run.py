@@ -2,36 +2,25 @@
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 
 import argparse
+import codecs
 import numpy as np
 
-from sklearn.cross_validation import cross_val_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.utils import shuffle
-from rumor_detect.document_modelling.utils.corpus import TextCorpus
+from sklearn.metrics import classification_report
 
 
-def construct_dataset(pos_path, neg_path):
-    """
-    Construct data set from pos_path and neg_path object.
-    Each line in those files is a segmented document.
-
-    Input:
-    - pos_file: file object containing positive instances.
-    - neg_file: file object containing negative instances.
-    Output:
-    - X: list of documents.
-    - y: document labels.
-    """
-    X_pos = [doc for doc in TextCorpus(pos_path)]
-    X_neg = [doc for doc in TextCorpus(neg_path)]
-    y_pos = np.ones(len(X_pos), dtype=np.int32)
-    y_neg = -1 * np.ones(len(X_neg), dtype=np.int32)
-    X = X_pos + X_neg
-    y = np.concatenate((y_pos, y_neg))
-    X, y = shuffle(X, y, random_state=12345)
+def read_data(path):
+    X, y = [], []
+    with codecs.open(path, 'r', 'utf-8') as in_file:
+        for line in in_file:
+            args = line.strip().split()
+            label = int(args[0])
+            x = ' '.join(args[1:])
+            X.append(x)
+            y.append(label)
     return X, y
 
 
@@ -94,21 +83,22 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "pos_path",
-        help="positive instances file path"
+        "train_path",
+        help="train file path"
     )
     parser.add_argument(
-        "neg_path",
-        help="negative instances file path"
+        "valid_path",
+        help="validation file path"
     )
     args = parser.parse_args()
-    X, y = construct_dataset(args.pos_path, args.neg_path)
+    X_train, y_train = read_data(args.train_path)
+    X_valid, y_valid = read_data(args.valid_path)
 
     # Searching for good tfidf param
-    # tfidf_param_search(X, y)
+    # tfidf_param_search(X_train, y_train)
 
     # Search for good LR param
-    # lr_param_search(X, y)
+    # lr_param_search(X_train, y_train)
 
     # Best parameter
     tfidf = TfidfVectorizer(ngram_range=(1, 2), dtype=np.int32, lowercase=True,
@@ -116,5 +106,6 @@ if __name__ == "__main__":
                             norm='l2', use_idf=True)
     lr = LogisticRegression(C=10)
     pipeline = Pipeline([('tfidf', tfidf), ('lr', lr)])
-    score = cross_val_score(pipeline, X, y, n_jobs=3)
-    print "Best parameter cv score", score
+    pipeline.fit(X_train, y_train)
+    y_valid_predict = pipeline.predict(X_valid)
+    print classification_report(y_valid, y_valid_predict)

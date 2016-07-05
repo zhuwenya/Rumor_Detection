@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
-from rumor_detect.document_modelling.ngrams.run import construct_dataset
+from rumor_detect.document_modelling.ngrams.run import read_data
 
 if __name__ == "__main__":
     """
@@ -14,19 +14,15 @@ if __name__ == "__main__":
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "pos_path",
-        help="positive instances file path"
-    )
-    parser.add_argument(
-        "neg_path",
-        help="negative instances file path"
+        "train_path",
+        help="training file path"
     )
     parser.add_argument(
         "k",
         help="words number to print"
     )
     args = parser.parse_args()
-    sentences, y = construct_dataset(args.pos_path, args.neg_path)
+    sentences, y = read_data(args.train_path)
 
     # build vocabulary and train LR
     tfidf = TfidfVectorizer(ngram_range=(1, 2), dtype=np.int32, lowercase=True,

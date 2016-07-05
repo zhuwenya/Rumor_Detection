@@ -30,23 +30,35 @@ network for classification (Kim, 2014). The original purpose for this
 network is to do sentiment analysis. Because of its simpleness and efficiency,
 it is a strong baseline method for sentence classification. Here we treat each
 document as a long sentence input to this model. The widths of convolution
-filter are 2, 3, 4 and 5, 100 filters for each width. We train 100-dimensional
+filter are 2, 3, 4 and 5, 64 filters for each width. We train 100-dimensional
 SkipGram (Mikolov et al., 2013) vectors from an unlabeded dataset with 770k
 documents. Our code is mainly based on [cnn-text-classification-tf][CNN-tf] and
 reimplement it to support loading word vectors. To better understand the effect
 of pretrain word vectors, we also conduct an experiment on this model without
 pretrain vectors.
 
-## Result
-| Method | Variant  | Text-S |
-|--------|----------|--------|
-| TFIDF n-gram | up to 2-gram | 93.2 |
-| doc2vec | PV-DBOW | 88.3 |
-| doc2vec | PV-DM | 81.2 |
-| doc2vec | PV | 88.7 |
-| CNN | word vectors from scratch | 93.3 |
-| CNN | pretrain word vectors | 95.9 |
+__LSTM__: This model begins with a look-up table that creates a embedding
+representation of each words and transforms the input sentence into a three
+dimensional tensor of shape _b_ x _t_ x _h_, with _b_ the instances batch size,
+_t_ the max length of input sequences and _h_ the dimension of word embedded
+space. Different methods are experimented to get a good hidden vectors of
+input sequences. A softmax layer is applied to the hidden vectors to perform
+classification. In our experiements, we found that bi-directional LSTM
+implementation in tensorflow is inefficient to our problem such that we can't
+successfully train a model.
 
+## Text-S Result
+| Method | Variant  | Accuracy | Batch Time(128 instance) /s |
+|--------|----------|--------|--------|
+| TFIDF n-gram | up to 2-gram | 93.2 | - |
+| doc2vec | PV-DBOW | 88.3 | - |
+| doc2vec | PV-DM | 81.2 | - |
+| doc2vec | PV | 88.7 | - |
+| CNN | word vectors from scratch | 93.3 | 0.87 |
+| CNN | pretrain word vectors | 96.1 | 0.87 |
+| LSTM | last hidden vector | 94.1 | 2.10 |
+| LSTM | mean pooling hidden vector | 97.1 | 2.07 |
+| Bi-LSTM | mean pooling hidden vector | - | - |
 
 ## Reference
 * sklearn: <http://scikit-learn.org/>
@@ -59,7 +71,6 @@ Distributed Representations of Sentences and Documents.
 Distributed Representations of Words and Phrases and their Compositionality.
 * Yoon Kim. 2014.
 Convolutional Neural Networks for Sentence Classification.
-
 
 
 [sklearn]: http://scikit-learn.org/

@@ -1,0 +1,21 @@
+{
+  "BATCH_SIZE": 128,
+  "NUM_TRAIN_EPOCH": 20,
+  "NUM_TRAIN_EPOCH_PER_TEST": 2,
+  "NUM_DECAY_EPOCH": 5,
+  "DECAY_FACTOR": 0.1,
+  "INIT_LEARNING_RATE": 0.1,
+  "MOMENTUM": 0.9,
+  "FILTER_SIZES": [2, 3, 4, 5],
+  "NUM_FILTERS": 64,
+  "DROPOUT_KEEP_RATE": 0.5,
+  "WEIGHT_DECAY": 0.0001,
+  "GAUSSIAN_STDDEV": 0.01,
+  "SEQUENCE_MAX_LEN": 100,
+  "NUM_CLASSES": 2,
+  "MOVING_AVG": 0.999,
+  "CLASSIFER_TYPE": "CNN_SINGLE_LAYER",
+  "LOG_DIR": "/tmp/tensorflow/cnn_single_layer/log/",
+  "MODEL_DIR": "/tmp/tensorflow/cnn_single_layer/model/",
+  "RESULT_DIR": "/tmp/tensorflow/cnn_single_layer/result/"
+}

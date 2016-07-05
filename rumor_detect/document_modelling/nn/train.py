@@ -4,6 +4,8 @@
 import logging
 import json
 from argparse import ArgumentParser
+from rumor_detect.document_modelling.nn.cnn.resnet.classifier import \
+    CNNResnetClassifier
 
 from rumor_detect.document_modelling.nn.common.rumor_corpus_for_nn import \
     RumorCorpusForNN
@@ -11,11 +13,14 @@ from rumor_detect.document_modelling.nn.common.word2vec_lookup_table import \
     Word2VecLookupTable
 from rumor_detect.document_modelling.nn.rnn.lstm_avg.classifier import \
     LSTMAverageClassifier
+from rumor_detect.document_modelling.nn.rnn.lstm_bi_avg.classifier import \
+    LSTMBidirectionalAverageClassifier
 from rumor_detect.document_modelling.nn.rnn.lstm_standard.classifier import \
     LSTMStandardClassifier
 from rumor_detect.document_modelling.nn.softmax.classifier import \
     SoftmaxClassifier
-from rumor_detect.document_modelling.nn.cnn.classifier import CNNClassifier
+from rumor_detect.document_modelling.nn.cnn.single_layer.classifier import \
+    CNNSingleLayerClassifier
 
 logger = logging.getLogger("nn.train")
 
@@ -23,9 +28,11 @@ logger = logging.getLogger("nn.train")
 def construct_classifier(config):
     constructor = {
         'SOFTMAX': SoftmaxClassifier,
-        'CNN': CNNClassifier,
+        'CNN_SINGLE_LAYER': CNNSingleLayerClassifier,
+        'CNN_RESNET': CNNResnetClassifier,
         'LSTM_STANDARD': LSTMStandardClassifier,
-        'LSTM_AVG': LSTMAverageClassifier
+        'LSTM_AVG': LSTMAverageClassifier,
+        'LSTM_BI_AVG': LSTMBidirectionalAverageClassifier
     }[config['CLASSIFER_TYPE']]
     clf = constructor(config)
     logger.info('get classifier %s' % type(clf).__name__)

@@ -5,7 +5,7 @@ from rumor_detect.document_modelling.nn.common.classifier import \
     NeuralNetworkClassifier
 
 
-class CNNClassifier(NeuralNetworkClassifier):
+class CNNSingleLayerClassifier(NeuralNetworkClassifier):
     """ Single convolution layer classifier based on
     [Yoon Kim. 2014. Convolutional Neural Networks for Sentence Classification.]
     """

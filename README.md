@@ -48,17 +48,18 @@ implementation in tensorflow is inefficient to our problem such that we can't
 successfully train a model.
 
 ## Text-S Result
-| Method | Variant  | Accuracy | Batch Time(128 instance) /s |
-|--------|----------|--------|--------|
-| TFIDF n-gram | up to 2-gram | 93.2 | - |
-| doc2vec | PV-DBOW | 88.3 | - |
-| doc2vec | PV-DM | 81.2 | - |
-| doc2vec | PV | 88.7 | - |
-| CNN | word vectors from scratch | 93.3 | 0.87 |
-| CNN | pretrain word vectors | 96.1 | 0.87 |
-| LSTM | last hidden vector | 94.1 | 2.10 |
-| LSTM | mean pooling hidden vector | 97.1 | 2.07 |
-| Bi-LSTM | mean pooling hidden vector | - | - |
+| Method | Variant  | Accuracy | Batch Time(128 instance) /s | Memory /M |
+|--------|----------|--------|--------| -------- |
+| TFIDF n-gram | up to 2-gram | 93.2 | - | - |
+| doc2vec | PV-DBOW | 88.3 | - | - |
+| doc2vec | PV-DM | 81.2 | - | - |
+| doc2vec | PV | 88.7 | - | - |
+| CNN | word vectors from scratch | 93.3 | 0.62 | 4288 |
+| CNN | pretrain word vectors | 96.1 | 0.62 | 4288 |
+| ResNet | 11 layer | 96.6 | 0.21 | 7372 |
+| LSTM | last hidden vector | 94.1 | 2.10 | 4245 |
+| LSTM | mean pooling hidden vector | 97.1 | 2.07 | 4245 |
+| Bi-LSTM | mean pooling hidden vector | - | - | - |
 
 ## Reference
 * sklearn: <http://scikit-learn.org/>

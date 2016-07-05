@@ -27,7 +27,7 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             input_channel = int(embedded_X_reshape.get_shape()[3])
             W1 = tf.get_variable(
                 name="weights",
-                shape=[3, 1, input_channel, 16],
+                shape=[3, 1, input_channel, 32],
                 initializer=weight_initializer,
                 regularizer=regularizer
             )
@@ -58,9 +58,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-2"):
-            conv2 = self.residual_block(pool1, 32, is_training)
+            conv2_1 = self.residual_block(pool1, 32, is_training)
+            conv2_2 = self.residual_block(conv2_1, 32, is_training)
             pool2 = tf.nn.max_pool(
-                conv2,
+                conv2_2,
                 ksize=[1, 5, 1, 1],
                 strides=[1, 5, 1, 1],
                 padding="VALID",
@@ -68,9 +69,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-3"):
-            conv3 = self.residual_block(pool2, 64, is_training)
+            conv3_1 = self.residual_block(pool2, 64, is_training)
+            conv3_2 = self.residual_block(conv3_1, 64, is_training)
             pool3 = tf.nn.max_pool(
-                conv3,
+                conv3_2,
                 ksize=[1, 5, 1, 1],
                 strides=[1, 5, 1, 1],
                 padding="VALID",
@@ -78,9 +80,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-4"):
-            conv3 = self.residual_block(pool3, 128, is_training)
+            conv4_1 = self.residual_block(pool3, 128, is_training)
+            conv4_2 = self.residual_block(conv4_1, 128, is_training)
             pool4 = tf.nn.max_pool(
-                conv3,
+                conv4_2,
                 ksize=[1, 4, 1, 1],
                 strides=[1, 4, 1, 1],
                 padding="VALID",
@@ -88,9 +91,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-5"):
-            conv5 = self.residual_block(pool4, 256, is_training)
+            conv5_1 = self.residual_block(pool4, 256, is_training)
+            conv5_2 = self.residual_block(conv5_1, 256, is_training)
             pool5 = tf.nn.avg_pool(
-                conv5,
+                conv5_2,
                 ksize=[1, config['SEQUENCE_MAX_LEN'] / 500, 1, 1],
                 strides=[1, config['SEQUENCE_MAX_LEN'] / 500, 1, 1],
                 padding="VALID",

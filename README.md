@@ -56,7 +56,7 @@ successfully train a model.
 | doc2vec | PV | 88.7 | - | - |
 | CNN | word vectors from scratch | 93.3 | 0.62 | 4288 |
 | CNN | pretrain word vectors | 96.1 | 0.62 | 4288 |
-| ResNet | 11 layer | 96.6 | 0.21 | 7372 |
+| ResNet | 18 layer | 96.6 | 0.25 | 7372 |
 | LSTM | last hidden vector | 94.1 | 2.10 | 4245 |
 | LSTM | mean pooling hidden vector | 97.1 | 2.07 | 4245 |
 | Bi-LSTM | mean pooling hidden vector | - | - | - |

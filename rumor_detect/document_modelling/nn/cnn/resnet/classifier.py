@@ -103,12 +103,6 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
 
         with tf.variable_scope("FC-6"):
             flat = tf.reshape(pool5, [-1, 256])
-            flat_dropout = tf.nn.dropout(
-                flat,
-                config['DROPOUT_KEEP_RATE'] if is_training else 1.0,
-                name="dropout"
-            )
-
             W = tf.get_variable(
                 name="weights",
                 shape=[256, config['NUM_CLASSES']],
@@ -120,7 +114,7 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
                 shape=[config['NUM_CLASSES']],
                 initializer=bias_initializer
             )
-            logits = tf.add(tf.matmul(flat_dropout, W), b, name="logits")
+            logits = tf.add(tf.matmul(flat, W), b, name="logits")
 
         return logits
 

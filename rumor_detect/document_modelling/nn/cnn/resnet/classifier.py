@@ -33,7 +33,7 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
             b1 = tf.get_variable(
                 name="bias",
-                shape=[16],
+                shape=[32],
                 initializer=bias_initializer
             )
             conv1 = tf.nn.bias_add(

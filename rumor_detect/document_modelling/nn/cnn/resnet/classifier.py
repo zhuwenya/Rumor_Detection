@@ -58,8 +58,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-2"):
-            conv2_1 = self.residual_block(pool1, 32, is_training)
-            conv2_2 = self.residual_block(conv2_1, 32, is_training)
+            with tf.variable_scope("Block1"):
+                conv2_1 = self.residual_block(pool1, 32, is_training)
+            with tf.variable_scope("Block2"):
+                conv2_2 = self.residual_block(conv2_1, 32, is_training)
             pool2 = tf.nn.max_pool(
                 conv2_2,
                 ksize=[1, 5, 1, 1],
@@ -69,8 +71,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-3"):
-            conv3_1 = self.residual_block(pool2, 64, is_training)
-            conv3_2 = self.residual_block(conv3_1, 64, is_training)
+            with tf.variable_scope("Block1"):
+                conv3_1 = self.residual_block(pool2, 64, is_training)
+            with tf.variable_scope("Block2"):
+                conv3_2 = self.residual_block(conv3_1, 64, is_training)
             pool3 = tf.nn.max_pool(
                 conv3_2,
                 ksize=[1, 5, 1, 1],
@@ -80,8 +84,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-4"):
-            conv4_1 = self.residual_block(pool3, 128, is_training)
-            conv4_2 = self.residual_block(conv4_1, 128, is_training)
+            with tf.variable_scope("Block1"):
+                conv4_1 = self.residual_block(pool3, 128, is_training)
+            with tf.variable_scope("Block2"):
+                conv4_2 = self.residual_block(conv4_1, 128, is_training)
             pool4 = tf.nn.max_pool(
                 conv4_2,
                 ksize=[1, 4, 1, 1],
@@ -91,8 +97,10 @@ class CNNResnetClassifier(NeuralNetworkClassifier):
             )
 
         with tf.variable_scope("Conv-5"):
-            conv5_1 = self.residual_block(pool4, 256, is_training)
-            conv5_2 = self.residual_block(conv5_1, 256, is_training)
+            with tf.variable_scope("Block1"):
+                conv5_1 = self.residual_block(pool4, 256, is_training)
+            with tf.variable_scope("Block2"):
+                conv5_2 = self.residual_block(conv5_1, 256, is_training)
             pool5 = tf.nn.avg_pool(
                 conv5_2,
                 ksize=[1, config['SEQUENCE_MAX_LEN'] / 500, 1, 1],

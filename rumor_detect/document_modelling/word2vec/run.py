@@ -25,5 +25,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     sentences = LineSentence(args.doc_path)
-    model = Word2Vec(sentences, size=200, min_count=30, workers=6, negative=10)
+    model = Word2Vec(sentences, size=100, min_count=30, workers=7, negative=10,
+                     iter=10, sg=1)
     model.save_word2vec_format(args.save_path)

@@ -5,6 +5,7 @@ import logging
 import os
 import pickle
 import numpy as np
+from sklearn.metrics import classification_report
 import tensorflow as tf
 import time
 
@@ -154,13 +155,12 @@ class NeuralNetworkClassifier(object):
                 y_pred[start_idx:end_idx, :] = y_pred_batch
                 y_gt[start_idx:end_idx] = y_feed
 
-            accuracy = np.mean(np.argmax(y_pred, axis=1) == y_gt)
-            logger.info('validation accuracy: %.3f' % accuracy)
+            logger.info('Classification report:')
+            print classification_report(y_gt, y_pred)
 
             # dump results
             logger.info('dump results...')
             m = {
-                'accuracy': accuracy,
                 'y_true': y_gt,
                 'y_pred': y_pred[:, config['NUM_CLASSES'] - 1]
             }

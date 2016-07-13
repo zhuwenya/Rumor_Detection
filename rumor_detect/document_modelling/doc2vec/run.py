@@ -1,125 +1,126 @@
 # coding=utf-8
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 
-import argparse
-import random
+import codecs
 import numpy as np
 import logging
 import sklearn.utils
-from sklearn.cross_validation import cross_val_score
 from sklearn.linear_model import LogisticRegression
-from rumor_detect.document_modelling.utils.corpus \
-    import TextSegmentedCorpus
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from rumor_detect.document_modelling.utils.metrics import print_metrics
+
+TRAIN_PATH = '../data/train.data'
+VALID_PATH = '../data/valid.data'
 
 
 class HelperCorpus:
-    """
-    Corpus helper for training doc2vec.
-    """
-    def __init__(self, path, prefix):
-        """
-        Construct corpus iterator from files.
-        Input:
-        - path: csv file containing documents.
-        """
-        self.corpus_ = TextSegmentedCorpus(path)
-        self.prefix_ = prefix
-
-    def __iter__(self):
-        """
-        Iterate over documents sequentially.
-        Output:
-        - tagged_doc: an doc2vec.TaggedDocument object. Each document is tagged
-         as <prefix>_<idxnum>
-        """
-        for i, sentence in enumerate(self.corpus_):
-            yield TaggedDocument(sentence, ["%s_%d" % (self.prefix_, i)])
-            self.count_ = i + 1
-
-    def count(self):
-        return self.count_
-
-    
-class CombinedCorpus:
     def __init__(self):
-        self.corpus_list_ = []
+        train_pos, train_neg = 0, 0
+        with codecs.open(TRAIN_PATH, 'r', 'utf-8') as in_file:
+            for line in in_file:
+                args = line.strip().split()
+                label = int(args[0])
+                train_pos += (label == 1)
+                train_neg += (label == 0)
 
-    def add(self, corpus):
-        self.corpus_list_.append(corpus)
+        valid_pos, valid_neg = 0, 0
+        with codecs.open(VALID_PATH, 'r', 'utf-8') as in_file:
+            for line in in_file:
+                args = line.strip().split()
+                label = int(args[0])
+                valid_pos += (label == 1)
+                valid_neg += (label == 0)
+
+        self.train_pos_ = train_pos
+        self.train_neg_ = train_neg
+        self.valid_pos_ = valid_pos
+        self.valid_neg_ = valid_neg
 
     def __iter__(self):
-        for corpus in self.corpus_list_:
-            for sentence in corpus:
-                yield sentence
+        train_pos_i, train_neg_i = 0, 0
+        with codecs.open(TRAIN_PATH, 'r', 'utf-8') as in_file:
+            for line in in_file:
+                args = line.strip().split()
+                label = int(args[0])
+                sentence = args[1:]
+                if label == 1:
+                    tag = 'TRAIN_POS_%d' % train_pos_i
+                    train_pos_i += 1
+                else:
+                    tag = 'TRAIN_NEG_%d' % train_neg_i
+                    train_neg_i += 1
+                yield TaggedDocument(sentence, [tag])
+
+        valid_pos_i, valid_neg_i = 0, 0
+        with codecs.open(VALID_PATH, 'r', 'utf-8') as in_file:
+            for line in in_file:
+                args = line.strip().split()
+                label = int(args[0])
+                sentence = args[1:]
+                if label == 1:
+                    tag = 'VALID_POS_%d' % valid_pos_i
+                    valid_pos_i += 1
+                else:
+                    tag = 'VALID_NEG_%d' % valid_neg_i
+                    valid_neg_i += 1
+                yield TaggedDocument(sentence, [tag])
 
                 
-class MemoryShuffleCorpus:
-    def __init__(self, base_corpus):
-        sentences = []
-        for sentence in base_corpus:
-            sentences.append(sentence)
-        self.sentences_ = sentences
-
-    def __iter__(self):
-        random.shuffle(self.sentences_)
-        for sentence in self.sentences_:
-            yield sentence
-
-            
-def grid_search(pos_path, neg_path):
+def run(dim=400):
     logger = logging.getLogger("doc2vec.run")
 
-    # pretrain doc from a large dataset
-    pos_corpus = HelperCorpus(pos_path, "POS")
-    neg_corpus = HelperCorpus(neg_path, "NEG")
-    combined_corpus = CombinedCorpus()
-    combined_corpus.add(pos_corpus)
-    combined_corpus.add(neg_corpus)
-    corpus = MemoryShuffleCorpus(combined_corpus)
-    # model_dm = Doc2Vec(corpus, size=400, alpha=0.025, window=4,
-    #                    min_count=5, sample=1e-5, hs=0, negative=15,
-    #                    dm=1, dm_concat=0, dbow_words=0, iter=20, workers=7)
-    model_dbow = Doc2Vec(corpus, size=400, alpha=0.025, window=4,
-                         min_count=5, sample=1e-5, hs=0, negative=15,
-                         dm=0, dm_concat=0, dbow_words=0, iter=20, workers=7)
+    logger.info('calculating doc2vec model...')
+    corpus = HelperCorpus()
+    model_dm = Doc2Vec(corpus, size=dim, alpha=0.025, window=4,
+                       min_count=5, sample=1e-5, hs=0, negative=10,
+                       dm=1, dm_concat=0, dbow_words=0, iter=15, workers=7)
+    model_dbow = Doc2Vec(corpus, size=dim, alpha=0.025, window=4,
+                         min_count=5, sample=1e-5, hs=0, negative=10,
+                         dm=0, dm_concat=0, dbow_words=0, iter=15, workers=7)
 
-    X = np.zeros((pos_corpus.count() + neg_corpus.count(), 400))
-    y = np.zeros(pos_corpus.count() + neg_corpus.count(), dtype=np.int32)
-    for pos_i in range(pos_corpus.count()):
-        X[pos_i] = model_dbow.docvecs['POS_%d' % pos_i]
-        y[pos_i] = 1
-    for neg_i in range(neg_corpus.count()):
-        X[pos_corpus.count() + neg_i] = model_dbow.docvecs['NEG_%d' % neg_i]
-        y[pos_corpus.count() + neg_i] = -1
-    X, y = sklearn.utils.shuffle(X, y)
+    logger.info('retrieving training vectors from model...')
+    X_train = np.zeros((corpus.train_pos_ + corpus.train_neg_, dim * 2))
+    y_train = np.zeros(corpus.train_pos_ + corpus.train_neg_, dtype=np.int32)
+    for pos_i in range(corpus.train_pos_):
+        X_train[pos_i, :dim] = model_dm.docvecs['TRAIN_POS_%d' % pos_i]
+        X_train[pos_i, dim:] = model_dbow.docvecs['TRAIN_POS_%d' % pos_i]
+        y_train[pos_i] = 1
+    for neg_i in range(corpus.train_neg_):
+        X_train[corpus.train_pos_ + neg_i, :dim] = \
+            model_dm.docvecs['TRAIN_NEG_%d' % neg_i]
+        X_train[corpus.train_pos_ + neg_i, dim:] = \
+            model_dbow.docvecs['TRAIN_NEG_%d' % neg_i]
+        y_train[corpus.train_pos_ + neg_i] = 0
+    X_train, y_train = sklearn.utils.shuffle(X_train, y_train)
 
-    for C in [100, 10, 1, 0.1, 0.01, 1e-3, 1e-4, 1e-5]:
-        logger.info("Training LR")
-        lr = LogisticRegression(C=C)
-        scores = cross_val_score(lr, X, y)
-        score = np.mean(scores)
-        logger.info("Cross validation score for LR (C=%f): %.3f" % (C, score))
+    logger.info('training logistic regression')
+    lr = LogisticRegression(C=10)
+    lr.fit(X_train, y_train)
 
+    logger.info('retrieving validation vectors from model...')
+    X_valid = np.zeros((corpus.valid_pos_ + corpus.valid_neg_, dim * 2))
+    y_valid = np.zeros(corpus.valid_pos_ + corpus.valid_neg_, dtype=np.int32)
+    for pos_i in range(corpus.valid_pos_):
+        X_valid[pos_i, :dim] = model_dm.docvecs['VALID_POS_%d' % pos_i]
+        X_valid[pos_i, dim:] = model_dbow.docvecs['VALID_POS_%d' % pos_i]
+        y_valid[pos_i] = 1
+    for neg_i in range(corpus.valid_neg_):
+        X_valid[corpus.valid_pos_ + neg_i, :dim] = \
+            model_dm.docvecs['VALID_NEG_%d' % neg_i]
+        X_valid[corpus.valid_pos_ + neg_i, dim:] = \
+            model_dbow.docvecs['VALID_NEG_%d' % neg_i]
+        y_valid[corpus.valid_pos_ + neg_i] = 0
+
+    logger.info('calculating results...')
+    y_valid_predict = lr.predict(X_valid)
+    print_metrics(y_valid, y_valid_predict)
 
 if __name__ == "__main__":
     """
     Running parameter search cross validation for small data set.
     """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "pos_path",
-        help="positive instances file path "
-    )
-    parser.add_argument(
-        "neg_path",
-        help="negative instances file path"
-    )
-    args = parser.parse_args()
-
     logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         level=logging.INFO
     )
-    grid_search(args.pos_path, args.neg_path)
+    run()

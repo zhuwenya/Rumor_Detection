@@ -1,10 +1,12 @@
 # coding=utf-8
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 
+from argparse import ArgumentParser
+
 import numpy as np
 import matplotlib.pyplot as plt
-from argparse import ArgumentParser
-from rumor_detect.document_modelling.utils.corpus \
+
+from rumor_analysis.corpus \
     import TextSegmentedCorpus
 
 if __name__ == "__main__":

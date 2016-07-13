@@ -1,12 +1,12 @@
 # coding=utf-8
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 import re
-import matplotlib.pyplot as plt
-import numpy as np
 from argparse import ArgumentParser
 
-from rumor_detect.document_modelling.utils.corpus import TextCorpus
+import matplotlib.pyplot as plt
+import numpy as np
 
+from rumor_analysis.corpus import TextCorpus
 
 PATTERN = u"，|。|！|？|；|……"
 

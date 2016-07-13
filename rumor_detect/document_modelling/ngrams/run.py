@@ -1,7 +1,6 @@
 # coding=utf-8
 # author: Qiaoan Chen <kazenoyumechen@gmail.com>
 
-import argparse
 import codecs
 import numpy as np
 
@@ -9,7 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import classification_report
+from rumor_detect.document_modelling.utils.metrics import print_metrics
 
 
 def read_data(path):
@@ -80,19 +79,8 @@ if __name__ == "__main__":
     Running parameter search cross validation for small data set.
     Large data set experiment haven't been test.
     """
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "train_path",
-        help="train file path"
-    )
-    parser.add_argument(
-        "valid_path",
-        help="validation file path"
-    )
-    args = parser.parse_args()
-    X_train, y_train = read_data(args.train_path)
-    X_valid, y_valid = read_data(args.valid_path)
+    X_train, y_train = read_data('../data/train.data')
+    X_valid, y_valid = read_data('../data/valid.data')
 
     # Searching for good tfidf param
     # tfidf_param_search(X_train, y_train)
@@ -107,5 +95,6 @@ if __name__ == "__main__":
     lr = LogisticRegression(C=10)
     pipeline = Pipeline([('tfidf', tfidf), ('lr', lr)])
     pipeline.fit(X_train, y_train)
+
     y_valid_predict = pipeline.predict(X_valid)
-    print classification_report(y_valid, y_valid_predict)
+    print_metrics(y_valid, y_valid_predict)

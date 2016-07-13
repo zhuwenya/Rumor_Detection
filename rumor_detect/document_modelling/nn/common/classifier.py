@@ -5,9 +5,9 @@ import logging
 import os
 import pickle
 import numpy as np
-from sklearn.metrics import classification_report
 import tensorflow as tf
 import time
+from rumor_detect.document_modelling.utils.metrics import print_metrics
 
 logger = logging.getLogger('nn.classifier')
 
@@ -156,7 +156,7 @@ class NeuralNetworkClassifier(object):
                 y_gt[start_idx:end_idx] = y_feed
 
             logger.info('Classification report:')
-            print classification_report(y_gt, y_pred)
+            print_metrics(y_gt, y_pred[:, config['NUM_CLASSES'] - 1])
 
             # dump results
             logger.info('dump results...')

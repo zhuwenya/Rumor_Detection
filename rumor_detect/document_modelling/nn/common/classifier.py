@@ -156,7 +156,8 @@ class NeuralNetworkClassifier(object):
                 y_gt[start_idx:end_idx] = y_feed
 
             logger.info('Classification report:')
-            print_metrics(y_gt, y_pred[:, config['NUM_CLASSES'] - 1])
+            y_pred_label = np.round(y_pred[:, config['NUM_CLASSES'] - 1])
+            print_metrics(y_gt, y_pred_label)
 
             # dump results
             logger.info('dump results...')

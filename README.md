@@ -44,18 +44,18 @@ implementation in tensorflow is inefficient to our problem such that we can't
 successfully train a model.
 
 ## Text-S Result
-| Method | Variant  | Accuracy | Precision | Recall | F1 | Batch Time(128 instance) /s | Memory /M |
-|--------|----------|----------|-----------|--------|----|-----------------------------|-----------|
-| TFIDF n-gram | up to 2-gram | 73.16 | 96.72 | 47.95 | 64.12 | - | - |
-| doc2vec | PV-DBOW | 76.95 | 90.43 | 60.29 | 72.34 | - | - |
-| doc2vec | PV-DM | 68.23 | 63.21 | 87.24 | 73.31 | - | - |
-| doc2vec | PV | 77.59 | 88.55 | 63.38 | 73.88 | - | - |
-| CNN | word vectors from scratch | - | - | - | - | - | - |
-| CNN | pretrain word vectors | - | - | - | - | - | - |
-| ResNet | 18 layer | - | - | - | - | - | - |
-| LSTM | last hidden vector | - | - | - | - | - | - |
-| LSTM | mean pooling hidden vector | - | - | - | - | - | - |
-| Bi-LSTM | mean pooling hidden vector | - | - | - | - | - | - |
+| Method | Variant  | AUC Score | Precision-0.9 | Batch Time(128 instance) /s | Memory /M |
+|--------|----------|-----------|---------------|-----------------------------|-----------|
+| TFIDF n-gram | up to 2-gram | 93.11 | 82.1 | - | - |
+| doc2vec | PV-DBOW | - | - | - | - |
+| doc2vec | PV-DM | - | - | - | - |
+| doc2vec | PV | - | - | - | - |
+| CNN | word vectors from scratch | - | - | - | - |
+| CNN | pretrain word vectors | - | - | - | - |
+| ResNet | 18 layer | - | - | - | - |
+| LSTM | last hidden vector | - | - | - | - |
+| LSTM | mean pooling hidden vector | - | - | - | - |
+| Bi-LSTM | mean pooling hidden vector | - | - | - | - |
 
 ## Reference
 * sklearn: <http://scikit-learn.org/>

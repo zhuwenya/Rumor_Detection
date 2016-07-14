@@ -8,7 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from rumor_detect.document_modelling.utils.metrics import print_metrics
+from rumor_detect.document_modelling.utils.metrics import print_all
 
 
 def read_data(path):
@@ -79,8 +79,9 @@ if __name__ == "__main__":
     Running parameter search cross validation for small data set.
     Large data set experiment haven't been test.
     """
-    X_train, y_train = read_data('../data/train.data')
-    X_valid, y_valid = read_data('../data/valid.data')
+    print 'reading data...'
+    X_train, y_train = read_data('../data/train_1_2.data')
+    X_valid, y_valid = read_data('../data/valid_1_100.data')
 
     # Searching for good tfidf param
     # tfidf_param_search(X_train, y_train)
@@ -88,13 +89,15 @@ if __name__ == "__main__":
     # Search for good LR param
     # lr_param_search(X_train, y_train)
 
-    # Best parameter
+    print 'fitting parameters...'
     tfidf = TfidfVectorizer(ngram_range=(1, 2), dtype=np.int32, lowercase=True,
                             max_df=0.5, min_df=5, max_features=500000,
                             norm='l2', use_idf=True)
-    lr = LogisticRegression(C=10)
+    lr = LogisticRegression(C=10, class_weight='balanced')
     pipeline = Pipeline([('tfidf', tfidf), ('lr', lr)])
     pipeline.fit(X_train, y_train)
 
-    y_valid_predict = pipeline.predict(X_valid)
-    print_metrics(y_valid, y_valid_predict)
+    # print metrics
+    idx = np.where(pipeline.classes_ == 1)[0][0]
+    y_score = pipeline.predict_proba(X_valid)[:, idx]
+    print_all(y_valid, y_score)

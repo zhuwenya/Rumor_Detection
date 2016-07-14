@@ -7,7 +7,8 @@ import pickle
 import numpy as np
 import tensorflow as tf
 import time
-from rumor_detect.document_modelling.utils.metrics import print_metrics
+from rumor_detect.document_modelling.utils.metrics import print_metrics, \
+    print_under_target_recall, print_all
 
 logger = logging.getLogger('nn.classifier')
 
@@ -156,8 +157,7 @@ class NeuralNetworkClassifier(object):
                 y_gt[start_idx:end_idx] = y_feed
 
             logger.info('Classification report:')
-            y_pred_label = np.round(y_pred[:, config['NUM_CLASSES'] - 1])
-            print_metrics(y_gt, y_pred_label)
+            print_all(y_gt, y_pred[:, config['NUM_CLASSES'] - 1])
 
             # dump results
             logger.info('dump results...')

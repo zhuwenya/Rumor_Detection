@@ -44,14 +44,14 @@ implementation in tensorflow is inefficient to our problem such that we can't
 successfully train a model.
 
 ## Text-S Result
-| Method | Variant  | AUC Score | Precision-0.9 | Batch Time(128 instance) /s | Memory /M |
-|--------|----------|-----------|---------------|-----------------------------|-----------|
-| TFIDF n-gram | up to 2-gram | 93.11 | 82.1 | - | - |
+| Method | Variant  | AUC Score | Precision-0.9 | Precision-0.95 | Batch Time(128 instance) /s | Memory /M |
+|--------|----------|-----------|---------------|----------------|-----------------------------|-----------|
+| TFIDF n-gram | up to 2-gram | 93.11 | 82.1 | 74.1 | - | - |
 | doc2vec | PV-DBOW | - | - | - | - |
 | doc2vec | PV-DM | - | - | - | - |
 | doc2vec | PV | - | - | - | - |
 | CNN | word vectors from scratch | - | - | - | - |
-| CNN | pretrain word vectors | - | - | - | - |
+| CNN | pretrain word vectors | 94.35 | 85.7 | 78.4 | - | - |
 | ResNet | 18 layer | - | - | - | - |
 | LSTM | last hidden vector | - | - | - | - |
 | LSTM | mean pooling hidden vector | - | - | - | - |
